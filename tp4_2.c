@@ -9,10 +9,11 @@ typedef struct
     int duracion; //entre 10-100
 } Tarea;
 
-typedef struct Nodo
-{
+typedef struct Nodo Nodo;
+
+typedef struct Nodo {
     Tarea T;
-    Nodo *Siguiente;
+    Nodo *Siguiente;  // Puntero a otro Nodo (esto es lo que enlaza la lista)
 } Nodo;
 
 Nodo * CrearListaVacia();
@@ -22,13 +23,68 @@ Nodo * QuitarNodoPorId(Nodo ** Start, int tareaID);
 Nodo * buscarNodo(Nodo * Start, int IdBuscado);
 void InsertarAlFinal(Nodo ** Start, Nodo * Nodo);
 void EliminarNodo(Nodo * nodo);
+void MostrarTareas(Nodo * Start);
 
 int main(){
-    Nodo * Start;
-    Tarea *Pendientes;
-    Tarea *Realizadas;
+    Nodo *Pendientes = CrearListaVacia();
+    Nodo *Realizadas = CrearListaVacia();
 
-    Start = CrearListaVacia();
+    Tarea TareaActual;
+
+    char continuar = 's';
+    int id = 1000;
+    int eleccion;
+
+    while (continuar == 's' ||  continuar == 'S')
+    {
+        printf("Ingrese la descripcion de la nueva tarea pendiente \n");
+        TareaActual.descripcion = (char *)malloc(100 * sizeof(char));
+        gets(TareaActual.descripcion);
+        
+        do
+        {
+            printf("Ingrese la duracion de la tarea (entre 10 y 100) ");
+            scanf("%d", &TareaActual.duracion);
+        } while (TareaActual.duracion < 10 || TareaActual.duracion > 100);
+
+        TareaActual.TareaID = id++;
+
+        Nodo * NNodo = NuevoNodo(&TareaActual);
+        InsertarAlFinal(&Pendientes,NNodo);
+        
+        printf("Desea continuar agregando tareas? (S/N) ");
+        getchar();
+        scanf("%s",&continuar);
+    }
+    
+    do
+    {
+        printf("\nLas tareas pendientes son: \n");
+        MostrarTareas(Pendientes);
+
+        printf("\nElija el id de la tarea que ya realizo, pulse 0 si no realizo ninguna tarea de la lista \n");
+        scanf("%d",&eleccion);
+
+        if (eleccion != 0)
+        {
+            Nodo * NodoTareaRealizada = QuitarNodoPorId(&Pendientes,eleccion);
+
+            if (NodoTareaRealizada != NULL)
+            {
+                InsertarAlFinal(&Realizadas,NodoTareaRealizada);
+                printf("Tarea con ID %d pasada a lista de tareas realizadas \n", eleccion);
+            } else
+            {
+                printf("Tarea con ID %d no se encontro en la lista \n",eleccion);
+            }
+        }
+
+    } while (eleccion != 0);
+    
+    printf("Tareas Pendientes\n");
+    MostrarTareas(Pendientes);
+    printf("Tareas Realizadas\n");
+    MostrarTareas(Realizadas);
 
     return 0;
 }
@@ -46,7 +102,6 @@ Nodo * NuevoNodo(Tarea * tarea){
     NNodo->Siguiente = NULL;
     return NNodo;
 }
-
 
 void InsertarNodo(Nodo ** Start, Nodo * Nodo){
     Nodo->Siguiente = *Start;
@@ -99,3 +154,15 @@ void EliminarNodo(Nodo * nodo)
     free(nodo);
 }
 
+void MostrarTareas(Nodo * Start) {
+    Nodo *aux = Start;
+    if (aux == NULL) {
+        printf("No hay tareas en la lista.\n");
+        return;
+    }
+    
+    while (aux != NULL) {
+        printf("ID: %d, Descripción: %s, Duración: %d\n", aux->T.TareaID, aux->T.descripcion, aux->T.duracion);
+        aux = aux->Siguiente;
+    }
+}
