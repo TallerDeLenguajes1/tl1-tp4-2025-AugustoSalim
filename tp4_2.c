@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//Linra extra para probar
+//Linra extra para probar a
 typedef struct 
 {
     int TareaID; // Numerico autoincremental comenzando en 1000
